@@ -25,43 +25,94 @@ public class Algebra {
 
 	// Returns x1 + x2
 	public static int plus(int x1, int x2) {
-		// Replace the following statement with your code
-		return 0;
+		int result = x1;
+        while (x2 > 0) {
+            result++;
+            x2--;
+        }
+        while (x2 < 0) {
+            result--;
+            x2++;
+        }
+        return result;
 	}
 
 	// Returns x1 - x2
 	public static int minus(int x1, int x2) {
-		// Replace the following statement with your code
-		return 0;
-	}
+		int result = x1;
+        while (x2 > 0) {
+            result--;
+            x2--;
+        }
+        while (x2 < 0) {
+            result++;
+            x2++;
+        }
+        return result;
+    }
 
 	// Returns x1 * x2
 	public static int times(int x1, int x2) {
-		// Replace the following statement with your code
-		return 0;
-	}
+        int result = 0;
+        int absX2 = x2 < 0 ? minus(0, x2) : x2;  // Ensure x2 is positive
+        for (int i = 0; i < absX2; i++) {
+            result = plus(result, x1);
+        }
+        return x2 < 0 ? minus(0, result) : result; // If x2 is negative, negate the result
+    }
 
 	// Returns x^n (for n >= 0)
 	public static int pow(int x, int n) {
-		// Replace the following statement with your code
-		return 0;
-	}
+        int result = 1;
+        while (n > 0) {
+            result = times(result, x);
+            n = minus(n, 1);
+        }
+        return result;
+    }
 
 	// Returns the integer part of x1 / x2 
 	public static int div(int x1, int x2) {
-		// Replace the following statement with your code
-		return 0;
-	}
+		int result = 0;
+        int absX1 = x1 < 0 ? minus(0, x1) : x1;  // Ensure x1 is positive
+        int absX2 = x2 < 0 ? minus(0, x2) : x2;  // Ensure x2 is positive
+        while (absX1 >= absX2) {
+            absX1 = minus(absX1, absX2);
+            result++;
+        }
+        return (x1 < 0) != (x2 < 0) ? minus(0, result) : result; // If signs differ, make result negative
+    }
+
 
 	// Returns x1 % x2
 	public static int mod(int x1, int x2) {
-		// Replace the following statement with your code
-		return 0;
-	}	
+		int absX1 = x1 < 0 ? minus(0, x1) : x1;
+        int absX2 = x2 < 0 ? minus(0, x2) : x2;
+        while (absX1 >= absX2) {
+            absX1 = minus(absX1, absX2);
+        }
+        return x1 < 0 ? minus(0, absX1) : absX1; // If x1 is negative, negate the result
+    }
+
 
 	// Returns the integer part of sqrt(x) 
 	public static int sqrt(int x) {
-		// Replace the following statement with your code
-		return 0;
-	}	  	  
+		int low = 0;
+        int high = x;
+        int result = 0;
+        while (low <= high) {
+            int mid = div(plus(low, high), 2);
+            int midSquared = times(mid, mid);
+            if (midSquared == x) {
+                return mid;
+            }
+            if (midSquared < x) {
+                low = plus(mid, 1);
+                result = mid;  // Update result with the latest valid mid
+            } else {
+                high = minus(mid, 1);
+            }
+        }
+        return result;
+    }
 }
