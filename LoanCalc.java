@@ -84,58 +84,61 @@
 
 public class LoanCalc {
 
-    static double epsilon = 0.001; // Approximation accuracy
-    static int iterationCounter;  // Number of iterations 
+    static double epsilon = 0.001; // דיוק החישוב
+    static int iterationCounter;  // מונה איטרציות
 
     public static void main(String[] args) {
-        // Input: loan amount, annual interest rate (percentage), number of payments
+        // קלט: סכום ההלוואה, שיעור ריבית שנתי (באחוזים), מספר התשלומים
         double loan = Double.parseDouble(args[0]);
-        double rate = Double.parseDouble(args[1]) / 100; // Convert to decimal
+        double annualRate = Double.parseDouble(args[1]);
         int n = Integer.parseInt(args[2]);
 
-        System.out.println("Loan = " + loan + ", interest rate = " + (rate * 100) + "%, periods = " + n);
+        // חישוב שיעור ריבית חודשי
+        double monthlyRate = annualRate / 100 / 12;
 
-        // Brute Force Solver
-        iterationCounter = 0; // Reset counter
+        System.out.println("Loan = " + loan + ", interest rate = " + annualRate + "%, periods = " + n);
+
+        // פיתרון באמצעות חיפוש גס
+        iterationCounter = 0; // איפוס המונה
         System.out.print("\nPeriodical payment, using brute force: ");
-        System.out.println((int) bruteForceSolver(loan, rate, n, epsilon));
-        System.out.println("number of iterations: " + iterationCounter);
+        System.out.println((int) bruteForceSolver(loan, monthlyRate, n, epsilon));
+        System.out.println("Number of iterations: " + iterationCounter);
 
-        // Bisection Solver
-        iterationCounter = 0; // Reset counter
+        // פיתרון באמצעות חיפוש בינארי
+        iterationCounter = 0; // איפוס המונה
         System.out.print("\nPeriodical payment, using bi-section search: ");
-        System.out.println((int) bisectionSolver(loan, rate, n, epsilon));
-        System.out.println("number of iterations: " + iterationCounter);
+        System.out.println((int) bisectionSolver(loan, monthlyRate, n, epsilon));
+        System.out.println("Number of iterations: " + iterationCounter);
     }
 
     /**
-     * Computes the ending balance of a loan.
+     * חישוב יתרה סופית של הלוואה.
      *
-     * @param loan    The loan amount.
-     * @param rate    The annual interest rate as a decimal.
-     * @param n       The number of payments.
-     * @param payment The fixed annual payment.
-     * @return The remaining balance after n payments.
+     * @param loan    סכום ההלוואה.
+     * @param rate    שיעור ריבית חודשי (עשרוני).
+     * @param n       מספר התשלומים.
+     * @param payment התשלום החודשי הקבוע.
+     * @return יתרה סופית אחרי n תשלומים.
      */
     private static double endBalance(double loan, double rate, int n, double payment) {
         double balance = loan;
         for (int i = 0; i < n; i++) {
-            balance = (balance - payment) * (1 + rate);
+            balance = balance * (1 + rate) - payment;
         }
         return balance;
     }
 
     /**
-     * Brute-force search for the periodical payment.
+     * חיפוש גס עבור התשלום התקופתי.
      *
-     * @param loan    The loan amount.
-     * @param rate    The annual interest rate as a decimal.
-     * @param n       The number of payments.
-     * @param epsilon The approximation accuracy.
-     * @return The periodical payment that reduces the balance to nearly zero.
+     * @param loan    סכום ההלוואה.
+     * @param rate    שיעור ריבית חודשי (עשרוני).
+     * @param n       מספר התשלומים.
+     * @param epsilon דיוק החישוב.
+     * @return התשלום התקופתי שמביא את היתרה לכמעט אפס.
      */
     public static double bruteForceSolver(double loan, double rate, int n, double epsilon) {
-        double payment = 0; // Start at zero payment
+        double payment = 0.0;
         iterationCounter = 0;
 
         while (true) {
@@ -143,33 +146,38 @@ public class LoanCalc {
             if (Math.abs(balance) < epsilon) {
                 return payment;
             }
-            payment += epsilon; // Increment payment by epsilon
+            payment += epsilon; // העלאת התשלום
             iterationCounter++;
+
+            // בדיקה למניעת לולאה אינסופית
+            if (payment > loan * (1 + rate)) {
+                throw new IllegalArgumentException("Solution not converging with brute force.");
+            }
         }
     }
 
     /**
-     * Bisection search for the periodical payment.
+     * חיפוש בינארי עבור התשלום התקופתי.
      *
-     * @param loan    The loan amount.
-     * @param rate    The annual interest rate as a decimal.
-     * @param n       The number of payments.
-     * @param epsilon The approximation accuracy.
-     * @return The periodical payment that reduces the balance to nearly zero.
+     * @param loan    סכום ההלוואה.
+     * @param rate    שיעור ריבית חודשי (עשרוני).
+     * @param n       מספר התשלומים.
+     * @param epsilon דיוק החישוב.
+     * @return התשלום התקופתי שמביא את היתרה לכמעט אפס.
      */
     public static double bisectionSolver(double loan, double rate, int n, double epsilon) {
-        double low = 0;               // Lower bound of payment
-        double high = loan * (1 + rate); // Upper bound of payment
-        double payment = 0;
+        double low = loan / n;               // הגבול התחתון לתשלום
+        double high = loan * (1 + rate);     // הגבול העליון לתשלום
+        double payment = 0.0;
 
         while ((high - low) > epsilon) {
-            payment = (low + high) / 2; // Midpoint
+            payment = (low + high) / 2.0; // נקודת האמצע
             double balance = endBalance(loan, rate, n, payment);
 
             if (balance > 0) {
-                low = payment; // Payment is too low
+                low = payment; // התשלום נמוך מדי
             } else {
-                high = payment; // Payment is too high
+                high = payment; // התשלום גבוה מדי
             }
             iterationCounter++;
         }

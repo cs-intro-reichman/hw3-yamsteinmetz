@@ -161,63 +161,88 @@ public class Algebra {
     }
 
     public static int plus(int x1, int x2) {
-        for (int i = 0; i < x2; i++) {
-            x1++;
+        while (x2 != 0) {
+            if (x2 > 0) {
+                x1++;
+                x2--;
+            } else {
+                x1--;
+                x2++;
+            }
         }
         return x1;
     }
 
     public static int minus(int x1, int x2) {
-        for (int i = 0; i < x2; i++) {
-            x1--;
-        }
-        return x1;
+        return plus(x1, -x2);
     }
 
     public static int times(int x1, int x2) {
-        int x3 = 0;
-        for (int i = 0; i < x2; i++) {
-            x3 = plus(x3, x1);
+        int result = 0;
+        boolean isNegative = false;
+
+        if (x2 < 0) {
+            x2 = -x2;
+            isNegative = true;
         }
-        return x3;
+
+        for (int i = 0; i < x2; i++) {
+            result = plus(result, x1);
+        }
+
+        return isNegative ? -result : result;
     }
 
     public static int pow(int x, int n) {
-        int x3 = 1;
-        for (int i = 0; i < n; i++) {
-            x3 = times(x3, x);
+        if (n < 0) {
+            throw new IllegalArgumentException("Exponent must be non-negative");
         }
-        return x3;
+        int result = 1;
+        for (int i = 0; i < n; i++) {
+            result = times(result, x);
+        }
+        return result;
     }
 
     public static int div(int x1, int x2) {
         if (x2 == 0) {
             throw new ArithmeticException("Division by zero");
         }
+
+        boolean isNegative = (x1 < 0) != (x2 < 0);
+        x1 = Math.abs(x1);
+        x2 = Math.abs(x2);
+
         int count = 0;
-        int x3 = 0;
-        while (plus(x3, x2) <= x1) {
-            x3 = plus(x3, x2);
+        while (x1 >= x2) {
+            x1 = minus(x1, x2);
             count++;
         }
-        return count;
+
+        return isNegative ? -count : count;
     }
 
     public static int mod(int x1, int x2) {
         if (x2 == 0) {
             throw new ArithmeticException("Modulo by zero");
         }
-        int x3 = 0;
-        while (plus(x3, x2) <= x1) {
-            x3 = plus(x3, x2);
+
+        boolean isNegative = x1 < 0;
+        x1 = Math.abs(x1);
+        x2 = Math.abs(x2);
+
+        while (x1 >= x2) {
+            x1 = minus(x1, x2);
         }
-        return minus(x1, x3);
+
+        return isNegative ? -x1 : x1;
     }
 
     public static int sqrt(int x) {
         if (x < 0) {
             throw new IllegalArgumentException("Square root of negative number");
         }
+
         int count = 0;
         while (times(count, count) <= x) {
             count++;
@@ -225,3 +250,4 @@ public class Algebra {
         return minus(count, 1);
     }
 }
+
