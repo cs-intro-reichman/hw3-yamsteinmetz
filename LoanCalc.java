@@ -138,18 +138,19 @@ public class LoanCalc {
      * @return התשלום התקופתי שמביא את היתרה לכמעט אפס.
      */
     public static double bruteForceSolver(double loan, double rate, int n, double epsilon) {
-        double payment = 0.0;
+        double payment = loan / n; // התחלה בסכום משוער של התשלום החודשי
         iterationCounter = 0;
 
         while (true) {
             double balance = endBalance(loan, rate, n, payment);
             if (Math.abs(balance) < epsilon) {
-                return payment;
+                return payment; // מצאנו את התשלום המתאים
             }
-            payment += epsilon; // העלאת התשלום
+
+            payment += epsilon; // העלאת התשלום בהדרגה
             iterationCounter++;
 
-            // בדיקה למניעת לולאה אינסופית
+            // מניעת לולאה אינסופית - אם התשלום גדול מדי
             if (payment > loan * (1 + rate)) {
                 throw new IllegalArgumentException("Solution not converging with brute force.");
             }
