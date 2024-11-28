@@ -211,46 +211,56 @@ import java.util.Random;
 
 public class TestAnagram {
     public static void main(String args[]) {
-        // Tests the isAnagram function
-        System.out.println("Test 1 (silent, listen): " + isAnagram("silent", "listen"));
-        System.out.println("Test 2 (William Shakespeare, I am a weakish speller): " + isAnagram("William Shakespeare", "I am a weakish speller"));
-        System.out.println("Test 3 (Madam Curie, Radium came): " + isAnagram("Madam Curie", "Radium came"));
-        System.out.println("Test 4 (Tom Marvolo Riddle, I am Lord Voldemort): " + isAnagram("Tom Marvolo Riddle", "I am Lord Voldemort"));
+        System.out.println("Testing isAnagram method:");
+        System.out.println("Test 1 (basic anagram): " + (isAnagram("silent", "listen") ? "PASS" : "FAIL"));
+        System.out.println("Test 2 (different lengths): " + (!isAnagram("abc", "abcd") ? "PASS" : "FAIL"));
+        System.out.println("Test 4 (empty strings): " + (isAnagram("", "") ? "PASS" : "FAIL"));
+        System.out.println("Test 5 (complex anagram): " + (isAnagram("William Shakespeare", "I am a weakish speller") ? "PASS" : "FAIL"));
+        System.out.println("Test 6 (case sensitivity): " + (isAnagram("aBc", "CBA") ? "PASS" : "FAIL"));
 
-        // Tests the preProcess function
-        System.out.println("Pre-process example: " + preProcess("What? No way!!!"));
+        System.out.println("\nTesting preProcess method:");
+        System.out.println("Test 1 (simple lowercase): " + (preProcess("abc").equals("abc") ? "PASS" : "FAIL"));
+        System.out.println("Test 2 (preserve spaces): " + (preProcess("a b c").equals("abc") ? "PASS" : "FAIL"));
+        System.out.println("Test 3 (case conversion): " + (preProcess("AbC").equals("abc") ? "PASS" : "FAIL"));
+        System.out.println("Test 4 (empty string): " + (preProcess("").equals("") ? "PASS" : "FAIL"));
 
-        // Tests the randomAnagram function
-        System.out.println("Random anagram example: silent and " + randomAnagram("silent") + " are anagrams.");
-
-        // Performs a stress test of randomAnagram
-        String str = "1234567";
+        System.out.println("\nTesting randomAnagram method:");
+        String str = "12345";
         boolean pass = true;
         for (int i = 0; i < 10; i++) {
             String randomAnagram = randomAnagram(str);
-            System.out.println(randomAnagram);
-            pass = pass && isAnagram(str, randomAnagram);
-            if (!pass) break;
+            if (!isAnagram(str, randomAnagram)) {
+                pass = false;
+                break;
+            }
         }
-        System.out.println(pass ? "Test passed" : "Test failed");
+        System.out.println("Test 1 (is anagram): " + (pass ? "PASS" : "FAIL"));
     }
 
+    // Returns true if the two given strings are anagrams, false otherwise.
     public static boolean isAnagram(String str1, String str2) {
         str1 = preProcess(str1);
         str2 = preProcess(str2);
+
         if (str1.length() != str2.length()) {
             return false;
         }
+
         char[] arr1 = str1.toCharArray();
         char[] arr2 = str2.toCharArray();
+
         java.util.Arrays.sort(arr1);
         java.util.Arrays.sort(arr2);
+
         return java.util.Arrays.equals(arr1, arr2);
     }
 
+    // Returns a preprocessed version of the given string: all the letter characters are converted
+    // to lower-case, and all the other characters are deleted.
     public static String preProcess(String str) {
         StringBuilder newStr = new StringBuilder();
         str = str.toLowerCase();
+
         for (char chr : str.toCharArray()) {
             if (Character.isLetter(chr)) {
                 newStr.append(chr);
@@ -259,9 +269,11 @@ public class TestAnagram {
         return newStr.toString();
     }
 
+    // Returns a random anagram of the given string using Fisher-Yates Shuffle.
     public static String randomAnagram(String str) {
         char[] strArr = str.toCharArray();
         Random rand = new Random();
+
         for (int i = strArr.length - 1; i > 0; i--) {
             int j = rand.nextInt(i + 1);
             char temp = strArr[i];
@@ -271,5 +283,6 @@ public class TestAnagram {
         return new String(strArr);
     }
 }
+
 
  
