@@ -67,6 +67,7 @@ public class TestAnagram {
         return passed;
     }
 
+
     public static int testRandomAnagram() {
         System.out.println("\nTesting randomAnagram method:");
         totalTests += 3;
@@ -98,3 +99,7 @@ public class TestAnagram {
         return passed;
     }
 } 
+
+
+
+ 
